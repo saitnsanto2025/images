@@ -1,0 +1,68 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Upload Images</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+#result {
+  margin-top: 20px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  display: none;
+  white-space: pre-wrap; /* keeps line breaks */
+}
+a {
+  color: blue;
+  text-decoration: underline;
+}
+</style>
+</head>
+<body>
+<h2>Upload Images to n8n</h2>
+
+<form id="uploadForm">
+  <label for="file">Select images:</label><br><br>
+  <input type="file" name="data" id="file" multiple required><br><br>
+  <button type="submit">Upload</button>
+</form>
+
+<div id="result"></div>
+
+<script>
+document.getElementById("uploadForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  const form = e.target;
+  const formData = new FormData(form);
+
+  try {
+    const response = await fetch("https://l3j2qk3a.rcsrv.net/webhook/upload-images", {
+      method: "POST",
+      body: formData
+    });
+
+    const text = await response.text(); // plain text from n8n
+    const resultDiv = document.getElementById("result");
+    resultDiv.style.display = "block";
+
+    // Turn each line into a clickable link
+    const lines = text.split("\n").map(line => {
+      const parts = line.split(": ");
+      if (parts.length === 2) {
+        return `<a href="${parts[1]}" target="_blank">${parts[0]}</a>`;
+      }
+      return line;
+    });
+
+    resultDiv.innerHTML = `✅ Upload successful!<br>${lines.join("<br>")}`;
+  } catch (err) {
+    alert("Upload failed: " + err.message);
+  }
+});
+</script>
+</body>
+</html>
